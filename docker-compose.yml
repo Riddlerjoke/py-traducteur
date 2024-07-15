@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    build:
+      context: ./bdd_traducteur
+      dockerfile: ./Dockerfile
+    container_name: db_trad
+    volumes:
+      - ./bdd:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
+
+  fastapi:
+    build:
+      context: ./api_traducteur
+      dockerfile: Dockerfile
+    container_name: fastapi_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: mysql+pymysql://traducteur:Punkrock@db_trad/traducteur
+
+  streamlit:
+    build:
+      context: ./web_traducteur
+      dockerfile: Dockerfile
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fastapi
+      - db
+
+volumes:
+  db_data:

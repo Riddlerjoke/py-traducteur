@@ -1,6 +1,6 @@
 import mysql.connector as mysqlpyth
 
-from config.parametres import BDD_USER, BDD_PASSWORD, BDD_HOST, BDD_PORT, BDD_DATABASE
+from src.config.parametres import BDD_USER, BDD_PASSWORD, BDD_HOST, BDD_PORT, BDD_DATABASE
 
 class Connexion :
 
