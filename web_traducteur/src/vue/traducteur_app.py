@@ -1,8 +1,11 @@
 # traducteur_app.py
+import json
+
 import streamlit as st
 from streamlit_chat import message
-from config.parametres import URL_TRADUCTEUR, URL_VERSIONS, URL_LOGIN, URL_TRADUCTIONS
+from config.parametre import URL_TRADUCTEUR, URL_VERSIONS, URL_LOGIN, URL_TRADUCTIONS
 import requests
+
 
 class TraducteurApp:
     def __init__(self):
@@ -92,20 +95,28 @@ class TraducteurApp:
             data = {
                 "atraduire": atraduire,
                 "version": option,
-                "utilisateur":st.session_state["logged_in"]
+                "utilisateur": st.session_state["logged_in"]
             }
 
             response = requests.post(self.URL_TRADUCTEUR, json=data)
 
             if response.status_code == 200:
-                st.success("Voici votre traduction !")
-                response_data = response.json()
-                reponse = f"{response_data['traduction'][0]['translation_text']}"
-                st.write(reponse)
-            else:
-                st.error(f"Erreur : {response.status_code}")
-                reponse = response.json()
-                st.json(response.json())
+                try:
+                    response = requests.post(self.URL_TRADUCTEUR, json=data)
+
+                    if response.status_code == 200:
+                        response_data = response.json()
+                        st.success("Voici votre traduction !")
+                        reponse = f"{response_data['traduction'][0]['translation_text']}"
+                        st.write(reponse)
+
+
+                except json.JSONDecodeError:
+                    st.error("Erreur lors de la décodage de la réponse du serveur.")
+                    st.write(response.text)  # Log the raw response text
+
+            st.error(f"Erreur : {response.status_code}")
+
 
     def add_chat(self):
         url = f"{self.URL_TRADUCTIONS}{st.session_state.logged_in}"

@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.10'
 
 services:
   db:
@@ -15,7 +15,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8081:8080
+      - "8081:8080"
 
 volumes:
   db_data:
