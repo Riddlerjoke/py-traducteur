@@ -1,6 +1,5 @@
 # traducteur_app.py
 import json
-
 import streamlit as st
 from streamlit_chat import message
 from config.parametre import URL_TRADUCTEUR, URL_VERSIONS, URL_LOGIN, URL_TRADUCTIONS
@@ -94,6 +93,7 @@ class TraducteurApp:
         if st.button("Traduire"):
             data = {
                 "atraduire": atraduire,
+                "traduction": "",
                 "version": option,
                 "utilisateur": st.session_state["logged_in"]
             }
@@ -115,7 +115,8 @@ class TraducteurApp:
                     st.error("Erreur lors de la décodage de la réponse du serveur.")
                     st.write(response.text)  # Log the raw response text
 
-            st.error(f"Erreur : {response.status_code}")
+            else:
+                st.error(f"Erreur : {response.status_code}")
 
 
     def add_chat(self):
@@ -125,10 +126,13 @@ class TraducteurApp:
         if chat.status_code == 200:
             chat_messages = chat.json()
 
-            for prompt in chat_messages:
-                message(prompt["atraduire"], is_user=True)
-                message(prompt["traduction"])
-        else :
+            if chat_messages:
+                st.subheader("Historique des traductions")
+            for i, prompt in enumerate(reversed(chat_messages)):
+                if prompt["traduction"]:
+                    message(prompt["atraduire"], is_user=True, key=f"user_message_{i}")
+                    message(prompt["traduction"], key=f"bot_message_{i}")
+        else:
             st.error(f"Erreur : {chat.status_code}")
 
 
