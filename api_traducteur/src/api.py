@@ -1,11 +1,15 @@
 from fastapi import FastAPI
 import uvicorn
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from config.parametres import VERSIONS
 from model.nlp import traduire
 from model.prompt import Prompt
 from dto.servicetraducteur import ServiceTraducteur as st
 from model.utilisateur import Utilisateur
+from prometheus_client import Summary, Counter
+import time
+import random
 
 tags = [
     {
@@ -28,6 +32,21 @@ app = FastAPI(
     version="1.0.0",
     openapi_tags=tags
 )
+
+# Créez des métriques Prometheus
+REQUEST_TIME = Summary('request_processing_seconds', 'Time spent processing request')
+REQUEST_COUNTER = Counter('app_requests_total', 'Total number of requests')
+
+# Instrumentateur Prometheus
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+
+
+@app.get("/")
+@REQUEST_TIME.time()
+def read_root():
+    REQUEST_COUNTER.inc()
+    time.sleep(random.random())
+    return {"Hello": "World"}
 
 
 @app.get("/versions", tags=["index"])

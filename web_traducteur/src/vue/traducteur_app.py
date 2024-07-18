@@ -113,7 +113,7 @@ class TraducteurApp:
 
                 except json.JSONDecodeError:
                     st.error("Erreur lors de la décodage de la réponse du serveur.")
-                    st.write(response.text)  # Log the raw response text
+                    st.write(response.text)
 
             else:
                 st.error(f"Erreur : {response.status_code}")

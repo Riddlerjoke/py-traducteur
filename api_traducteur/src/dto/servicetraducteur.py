@@ -9,7 +9,6 @@ class ServiceTraducteur(Connexion):
     def sauvegarder_prompt(cls, prompt: Prompt):
         cls.ouvrir_connexion()
         query = "INSERT INTO prompts (text_in, text_out, version, utilisateur) VALUES (%s, %s, %s, %s)"
-        print(prompt.traduction)
         values = [prompt.atraduire, prompt.traduction[0]['translation_text'], prompt.version, prompt.utilisateur]
         cls.cursor.execute(query, values)
         cls.bdd.commit()
@@ -29,7 +28,7 @@ class ServiceTraducteur(Connexion):
                 utilisateur.authentifie = True
 
         except Exception as e:
-            print(f"Une erreur inattendue est survenue :{e}")
+            return e
 
         finally:
             cls.fermer_connexion()
